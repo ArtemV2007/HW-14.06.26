@@ -40,7 +40,6 @@ public class Main {
                     System.out.print("Введите email: ");
                     String email = scanner.nextLine();
 
-                    // ИСПРАВЛЕНО: Безопасное чтение возраста
                     System.out.print("Введите возраст: ");
                     int age = readIntSafe(scanner);
 

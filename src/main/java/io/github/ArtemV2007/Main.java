@@ -10,7 +10,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        // Подключаем реальную реализацию DAO вместо заглушки
         UserDao userDao = new UserDaoImpl();
         UserService userService = new UserService(userDao);
         Scanner scanner = new Scanner(System.in);
@@ -25,8 +24,14 @@ public class Main {
             System.out.println("6. Выход");
             System.out.print("Выберите действие: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Очистка буфера после nextInt()
+            String input = scanner.nextLine();
+            int choice;
+            try {
+                choice = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите число от 1 до 6!");
+                continue;
+            }
 
             switch (choice) {
                 case 1:
@@ -34,44 +39,76 @@ public class Main {
                     String name = scanner.nextLine();
                     System.out.print("Введите email: ");
                     String email = scanner.nextLine();
+
+                    // ИСПРАВЛЕНО: Безопасное чтение возраста
                     System.out.print("Введите возраст: ");
-                    int age = scanner.nextInt();
+                    int age = readIntSafe(scanner);
+
                     userService.createUser(name, email, age);
+                    System.out.println("Запрос на создание пользователя отправлен.");
                     break;
+
                 case 2:
                     System.out.print("Введите ID: ");
-                    long id = scanner.nextLong();
+                    long id = readLongSafe(scanner);
                     User user = userService.getUserById(id);
                     System.out.println(user != null ? user : "Пользователь не найден.");
                     break;
+
                 case 3:
-                    // Исправленный синтаксис вывода списка
                     userService.getAllUsers().forEach(System.out::println);
                     break;
+
                 case 4:
                     System.out.print("Введите ID пользователя для обновления: ");
-                    long updateId = scanner.nextLong();
-                    scanner.nextLine();
+                    long updateId = readLongSafe(scanner);
                     System.out.print("Введите новое имя: ");
                     String newName = scanner.nextLine();
                     System.out.print("Введите новый email: ");
                     String newEmail = scanner.nextLine();
                     System.out.print("Введите новый возраст: ");
-                    int newAge = scanner.nextInt();
+                    int newAge = readIntSafe(scanner);
+
                     userService.updateUser(updateId, newName, newEmail, newAge);
                     break;
+
                 case 5:
                     System.out.print("Введите ID для удаления: ");
-                    long deleteId = scanner.nextLong();
+                    long deleteId = readLongSafe(scanner);
                     userService.deleteUser(deleteId);
+                    System.out.println("Запрос на удаление выполнен.");
                     break;
+
                 case 6:
                     System.out.println("Закрытие соединений с базой данных...");
-                    HibernateUtil.shutdown(); // Корректно закрываем фабрику сессий Hibernate
+                    HibernateUtil.shutdown();
                     System.out.println("Выход из программы.");
                     return;
+
                 default:
                     System.out.println("Неверный пункт меню!");
+            }
+        }
+    }
+
+    // Вспомогательный метод для безопасного чтения Integer
+    private static int readIntSafe(Scanner scanner) {
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Некорректный ввод! Введите целое число: ");
+            }
+        }
+    }
+
+    // Вспомогательный метод для безопасного чтения Long
+    private static long readLongSafe(Scanner scanner) {
+        while (true) {
+            try {
+                return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Некорректный ввод! Введите числовой ID: ");
             }
         }
     }

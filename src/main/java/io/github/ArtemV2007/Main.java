@@ -1,3 +1,5 @@
+package io.github.ArtemV2007;
+
 import io.github.ArtemV2007.dao.UserDao;
 import io.github.ArtemV2007.dao.UserDaoImpl;
 import io.github.ArtemV2007.model.User;
